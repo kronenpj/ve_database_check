@@ -8,6 +8,7 @@ EXAM_INDICES = {
     "E": 3,
 }
 
+
 class Question:
     q_p_id: int
     q_id: str
