@@ -31,7 +31,7 @@ def arg_parser():
     argp.add_argument(
         "-l", "--lev", type=int, default=1, help="Levenshtein distance, default=1"
     )
-    argp.add_argument("infile", nargs="*", type=str, default=None)
+    argp.add_argument("inputfile", nargs="*", type=str, default=None)
     args: argparse.Namespace = argp.parse_args()
     return args
 
@@ -43,7 +43,7 @@ def compare_questions():
 
     args = arg_parser()
 
-    for source in args.infile:
+    for source in args.inputfile:
         print(f"Checking {source} against database.")
         content = cpp.consume_pool(source)
 
