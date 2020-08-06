@@ -15,8 +15,6 @@ log = logging.getLogger(__name__)
 # sqllog = logging.getLogger('sqlalchemy.engine')
 # sqllog.setLevel(logging.DEBUG)
 
-EXAMDB_FILE = "ExamData.db"
-
 
 class Data:
     """Class to encapsulate interactions with the exam database."""
@@ -24,7 +22,7 @@ class Data:
     # Create a reference to the desired database for SQLAlchemy
     engine = None
 
-    def __init__(self, engine_file: str = EXAMDB_FILE):
+    def __init__(self, engine_file: str):
         self.engine = create_engine(f"sqlite:///{engine_file}")
 
         self.dbbase = automap_base()
@@ -36,12 +34,13 @@ class Data:
         self.dbsession = Session(self.engine)
 
         # mapped classes are now created with names by default matching that of the table name.
-        self.graphics = self.dbbase.classes.graphics
         self.hamquestion = self.dbbase.classes.hamquestion
         self.lockedout = self.dbbase.classes.lockedout
-        self.metadata = self.dbbase.classes.metadata  # pragma: no mutate
         self.pool = self.dbbase.classes.pool
         self.specs = self.dbbase.classes.specs
+        # These exist in the ARRL version of the database but this program doesn't check them.
+        # self.graphics = self.dbbase.classes.graphics
+        # self.metadata = self.dbbase.classes.metadata  # pragma: no mutate
 
     def pools(self) -> dict:
         """ Return all pool identifiers and names."""
