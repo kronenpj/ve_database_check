@@ -13,15 +13,17 @@ from typing import List, Dict, Any
 
 import sys
 
-from .globals import Question, EXAM_INDICES
+from .globals import Question
+from .constants import EXAM_INDICES
 
-log = logging.getLogger(__name__)
-# log.setLevel(logging.DEBUG)
+global_log = logging.getLogger(__package__)
+log = global_log.getChild(__name__.replace(f"{__package__}.", ""))
+log.setLevel(global_log.getEffectiveLevel())
 
 
 def collect_data_from_source(content: list) -> (List, List, Dict, Dict):
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
-    # mylog.setLevel(logging.DEBUG)
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     # Start parsing the lines of text.
@@ -47,7 +49,7 @@ def collect_data_from_source(content: list) -> (List, List, Dict, Dict):
 
 def consume_pool(inputfile: Any) -> List:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
-    # mylog.setLevel(logging.DEBUG)
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     file_content = []
@@ -70,7 +72,7 @@ def consume_pool(inputfile: Any) -> List:
 
 def _prune_content(filelines: list) -> list:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
-    # mylog.setLevel(logging.DEBUG)
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     found_exam_start_line = -1
@@ -91,7 +93,7 @@ def _prune_content(filelines: list) -> list:
 
 def _parse_subelements(filelines: list) -> list:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
-    # mylog.setLevel(logging.DEBUG)
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     retval = list()
@@ -108,7 +110,7 @@ def _parse_subelements(filelines: list) -> list:
 
 def _parse_subsubelements(filelines: list) -> list:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
-    # mylog.setLevel(logging.DEBUG)
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     found_exam_start = False
@@ -133,6 +135,7 @@ def _parse_subsubelements(filelines: list) -> list:
 
 def _parse_question_ids(filelines: list, subelement: str) -> list:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     found_exam_start = False
@@ -155,6 +158,7 @@ def _parse_question_ids(filelines: list, subelement: str) -> list:
 
 def _parse_question(filelines: list, question: str) -> Question:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
+    mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
     found_question_start = False
