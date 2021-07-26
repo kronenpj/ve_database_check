@@ -1,4 +1,3 @@
-
 EXAMDB_FILE = "ExamData.db"
 
 EXAM_INDICES = {

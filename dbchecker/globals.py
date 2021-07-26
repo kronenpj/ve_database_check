@@ -2,12 +2,6 @@
 Global information to be used by the module.
 """
 
-EXAM_INDICES = {
-    "T": 1,
-    "G": 2,
-    "E": 3,
-}
-
 
 class Question:
     q_p_id: int
@@ -21,14 +15,14 @@ class Question:
 
     def __init__(
         self,
-        q_p_id=None,
-        q_id=None,
-        q_text=None,
-        q_answer=None,
-        q_a=None,
-        q_b=None,
-        q_c=None,
-        q_d=None,
+        q_p_id,
+        q_id,
+        q_text,
+        q_answer,
+        q_a,
+        q_b,
+        q_c,
+        q_d,
     ):
         self.q_p_id = q_p_id
         self.q_id = q_id

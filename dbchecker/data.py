@@ -1,10 +1,8 @@
 """
 Provide an interface to retrieve information from the database.
 """
-
 import inspect
 import logging
-from builtins import dict, int, list, str
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.automap import automap_base
@@ -43,19 +41,16 @@ class Data:
         # self.metadata = self.dbbase.classes.metadata  # pragma: no mutate
 
     def pools(self) -> dict:
-        """ Return all pool identifiers and names."""
+        """Return all pool identifiers and names."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
 
         thing = self.dbsession.query(self.pool).order_by(text("p_id")).all()
-        pools = dict()
-        for item in thing:
-            pools[item.p_id] = item.p_name
-        return pools
+        return {item.p_id: item.p_name for item in thing}
 
     def pool_title(self, pool: int) -> str:
-        """ Return a pool title."""
+        """Return a pool title."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -67,7 +62,7 @@ class Data:
         return pools
 
     def pool_questions(self, pool: int) -> int:
-        """ Return the number of expected questions for the provided pool."""
+        """Return the number of expected questions for the provided pool."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -76,7 +71,7 @@ class Data:
         return thing[0].p_numq
 
     def specs_all_leadstrings(self) -> dict:
-        """ Return all 'lead strings' in all pools."""
+        """Return all 'lead strings' in all pools."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -84,13 +79,10 @@ class Data:
         thing = (
             self.dbsession.query(self.specs).order_by(text("s_p_id")).all()
         )  # pragma: no mutate
-        specs = dict()  # pragma: no mutate
-        for item in thing:
-            specs[item.s_leadstrings] = item.s_count  # pragma: no mutate
-        return specs
+        return {item.s_leadstrings: item.s_count for item in thing}  # pragma: no mutate
 
     def specs_pool_leadstrings(self, pool: int) -> dict:
-        """ Return 'lead strings' for the requested pool."""
+        """Return 'lead strings' for the requested pool."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -101,26 +93,20 @@ class Data:
             .order_by(text("s_leadstrings"))
             .all()
         )
-        specs = dict()
-        for item in thing:
-            specs[item.s_leadstrings] = item.s_count  # pragma: no mutate
-        return specs
+        return {item.s_leadstrings: item.s_count for item in thing}
 
     def all_lockedout_questions(self) -> list:
-        """ Return all questions listed as locked out."""
+        """Return all questions listed as locked out."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
 
         mylog.debug(f"Gathering all locked-out questions")
         thing = self.dbsession.query(self.lockedout).all()
-        retval = list()
-        for item in thing:
-            retval.append(item.lo_q_id)
-        return retval
+        return [item.lo_q_id for item in thing]
 
     def lockedout_questions(self, pool: int) -> list:
-        """ Return questions listed as locked out for a supplied pool."""
+        """Return questions listed as locked out for a supplied pool."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -131,13 +117,10 @@ class Data:
             .filter(self.lockedout.lo_p_id == pool)
             .all()
         )
-        retval = list()
-        for item in thing:
-            retval.append(item.lo_q_id)
-        return retval
+        return [item.lo_q_id for item in thing]
 
     def questions_leadstring(self, leadstring: str) -> list:
-        """ Return questions in the requested 'lead string' group."""
+        """Return questions in the requested 'lead string' group."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -149,13 +132,10 @@ class Data:
             .order_by(text("q_id"))
             .all()
         )
-        retval = list()
-        for item in thing:
-            retval.append(item.q_id)
-        return retval
+        return [item.q_id for item in thing]
 
     def question_data(self, question_id: str) -> dict:
-        """ Return requested question in a dictionary."""
+        """Return requested question in a dictionary."""
         mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
         # mylog.setLevel(logging.DEBUG)
         mylog.debug(f"Entering...")
@@ -169,7 +149,7 @@ class Data:
         mylog.debug(f"thing: <q_text={thing[0].q_text}, q_ans={thing[0].q_ans}>")
 
         # Construct the response
-        retval = {
+        return {
             "text": thing[0].q_text.strip(),
             "ans": thing[0].q_ans.strip(),
             "a": thing[0].q_a.strip(),
@@ -177,4 +157,3 @@ class Data:
             "c": thing[0].q_c.strip(),
             "d": thing[0].q_d.strip(),
         }
-        return retval

@@ -3,25 +3,21 @@
 """A simple python script template.
 
 """
-
-from __future__ import print_function, with_statement, unicode_literals, division
-
 import inspect
 import logging
 import re
-from typing import List, Dict, Any
-
 import sys
+from typing import Any, Dict, List, Tuple
 
-from .globals import Question
 from .constants import EXAM_INDICES
+from .globals import Question
 
 global_log = logging.getLogger(__package__)
 log = global_log.getChild(__name__.replace(f"{__package__}.", ""))
 log.setLevel(global_log.getEffectiveLevel())
 
 
-def collect_data_from_source(content: list) -> (List, List, Dict, Dict):
+def collect_data_from_source(content: list) -> Tuple[List, List, Dict, Dict]:
     mylog = log.getChild(f"{inspect.currentframe().f_code.co_name}")
     mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
@@ -29,19 +25,15 @@ def collect_data_from_source(content: list) -> (List, List, Dict, Dict):
     # Start parsing the lines of text.
     subelements = _parse_subelements(content)
 
-    subsubelements = list()
-    for temp in _parse_subsubelements(content):
-        subsubelements.append(temp)
+    subsubelements = [temp for temp in _parse_subsubelements(content)]
+    questions = {
+        subsubelement: [temp for temp in _parse_question_ids(content, subsubelement)]
+        for subsubelement in subsubelements
+    }
 
-    questions = dict()
-    for subsubelement in subsubelements:
-        questions[subsubelement] = list()
-        for temp in _parse_question_ids(content, subsubelement):
-            questions[subsubelement].append(temp)
-
-    question_data = dict()
-    for subsubelement in questions.keys():
-        for question in questions[subsubelement]:
+    question_data = {}
+    for subsubelement, value in questions.items():
+        for question in value:
             question_data[question] = _parse_question(content, question)
 
     return subelements, subsubelements, questions, question_data
@@ -77,13 +69,13 @@ def _prune_content(filelines: list) -> list:
 
     found_exam_start_line = -1
 
-    for line in range(0, len(filelines)):
+    for line in range(len(filelines)):
         if filelines[line].startswith(
             ("SUBELEMENT T1", "SUBELEMENT G1", "SUBELEMENT E1")
         ):
             found_exam_start_line = line
 
-    retlist = list()
+    retlist = []
     for item in range(found_exam_start_line - 1, len(filelines)):
         mylog.debug(f"Appending read: {filelines[item]}")
         retlist.append(filelines[item])
@@ -96,9 +88,9 @@ def _parse_subelements(filelines: list) -> list:
     mylog.setLevel(global_log.getEffectiveLevel())
     mylog.debug(f"Entering...")
 
-    retval = list()
     regexp = re.compile(r"^SUBELEMENT ([TGE][0-9]) - .*$")
 
+    retval = []
     for line in filelines:
         if line.startswith(("SUBELEMENT T", "SUBELEMENT G", "SUBELEMENT E")):
             mylog.debug(f"Matched line: {line}")
@@ -114,9 +106,9 @@ def _parse_subsubelements(filelines: list) -> list:
     mylog.debug(f"Entering...")
 
     found_exam_start = False
-    retval = list()
     regexp = re.compile(rf"^([TGE][0-9][A-Z]) .*$")
 
+    retval = []
     for line in filelines:
         mylog.debug(f"File line: {line}")
         if not found_exam_start:
@@ -139,9 +131,9 @@ def _parse_question_ids(filelines: list, subelement: str) -> list:
     mylog.debug(f"Entering...")
 
     found_exam_start = False
-    retval = list()
     regexp = re.compile(rf"^({subelement}[0-9]+) .*$")
 
+    retval = []
     for line in filelines:
         if not found_exam_start:
             # Skip through the file header until we find the start of the exam proper.
@@ -166,7 +158,7 @@ def _parse_question(filelines: list, question: str) -> Question:
     question_answer = re.compile(rf"^{question} \(([A-D])\).*$")
     question_options = re.compile(rf"^([A-D])\. (.*)$")
     answer = ""
-    choices = dict()
+    choices = {}
     text = ""
     for line in filelines:
         if not found_question_start:
@@ -195,7 +187,7 @@ def _parse_question(filelines: list, question: str) -> Question:
                         choices[choice] = choice_text
 
     pool_id = EXAM_INDICES[question[0]]
-    retval = Question(
+    return Question(
         pool_id,
         question,
         text,
@@ -205,4 +197,3 @@ def _parse_question(filelines: list, question: str) -> Question:
         choices["C"],
         choices["D"],
     )
-    return retval

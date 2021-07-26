@@ -6,7 +6,6 @@ import argparse
 import inspect
 import logging
 import sys
-from builtins import IndexError
 
 from Levenshtein.StringMatcher import StringMatcher
 
