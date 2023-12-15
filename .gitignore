@@ -19,5 +19,5 @@ release
 *.sql
 tests/test_shuffle_templates.py
 .tox
-venv
+.venv
 .vscode
